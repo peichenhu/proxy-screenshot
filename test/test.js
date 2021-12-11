@@ -1,38 +1,6 @@
-# proxy-screenshot
-
-一个使用 Puppeteer 对网站进行页面截图 NPM 工具包
-
-> npm i proxy-screenshot
-
-## demo
-
-````js
 'use strict';
 const { URL } = require('node:url');
-/**
- * @function screenshot
- * @param options 函数接受一个对象参数
- * @example
- * ```js
- * const { saveImageByCanvas, screenshot } = require('proxy-screenshot')
- * screenshot({
- *     showProgress: boolean; // 可选参数, 是否展示运行进度, 默认值 false
- *     link: string; // 可选参数, 需要截图的网页链接, 默认值 ''
- *     deviceName: string; // 可选参数, 模拟设备的标示名称, 默认值 iPhone 6
- *     width?: number; // 可选参数, 模拟设备视口宽度, 默认值 375
- *     height?: number; // 可选参数, 模拟设备视口高度, 默认值 667
- *     maxHeight: number; // 可选参数, 最终截图的最大高度, 默认值 667
- *     ip: string; // 可选参数, 模拟设备的IP, 默认值 '127.0.0.1'
- *     geo: {
- *         longitude: number;
- *         latitude: number;
- *     }; // 可选参数, 模拟设备的经纬度, 默认值 { longitude: 1, latitude: 1 }
- * })
- * ```
- * @returns 执行失败返回 `Promise<{ error: { message: any; link: any; }}> `
- * @returns 执行成功返回 `Promise<{ canvas: Canvas; }> `
- * @remarks 执行成功后可以使用 `saveImageByCanvas(canvas, outImgFile: string);` 保存 JPEG 图片到本地.
- */
+// const { saveImageByCanvas, screenshot } = require('proxy-screenshot');
 const { saveImageByCanvas, screenshot } = require('../dist/index.js');
 // IP 定位
 const IP = {
@@ -96,4 +64,3 @@ list.forEach(link => {
         }
     });
 });
-````

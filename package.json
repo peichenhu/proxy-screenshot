@@ -1,0 +1,49 @@
+{
+    "name": "proxy-screenshot",
+    "version": "3.0.2",
+    "description": "一个使用 Puppeteer 对 PC 网站或者特殊布局的 H5 页面进行截图的 NPM 工具包",
+    "main": "dist/index.js",
+    "dependencies": {
+        "canvas": "^2.8.0",
+        "puppeteer": "^11.0.0",
+        "puppeteer-core": "^11.0.0"
+    },
+    "devDependencies": {
+        "@rollup/plugin-commonjs": "^11.0.1",
+        "@rollup/plugin-node-resolve": "^13.0.6",
+        "@rollup/plugin-typescript": "^8.3.0",
+        "rollup": "^2.61.1",
+        "rollup-plugin-node-builtins": "^2.1.2",
+        "rollup-plugin-node-globals": "^1.4.0",
+        "rollup-plugin-terser": "^7.0.2",
+        "tslib": "^2.3.0",
+        "typescript": "^4.3.5"
+    },
+    "scripts": {
+        "build": "rollup -c",
+        "test": "node test/test.js"
+    },
+    "files": [
+        "dist"
+    ],
+    "author": "chenhu.pei",
+    "keywords": [
+        "puppeteer",
+        "screenshot",
+        "proxy-screenshot",
+        "chenhu.pei"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/pch1024/proxy-screenshot.git"
+    },
+    "homepage": "https://github.com/pch1024/proxy-screenshot#readme",
+    "maintainers": [
+        {
+            "name": "chenhu.pei",
+            "web": "https://www.peichenhu.cn",
+            "mail": "pch1024@outlook.com"
+        }
+    ],
+    "license": "MIT"
+}

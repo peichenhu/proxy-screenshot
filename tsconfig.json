@@ -1,0 +1,10 @@
+{
+    "include": ["src"],
+    "exclude": ["dist"],
+    "module": "CommonJS",
+    "compilerOptions": {
+        "outDir": "dist",
+        "declaration": true,
+        "declarationDir": "."
+    }
+}
