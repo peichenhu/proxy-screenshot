@@ -14,14 +14,15 @@ interface IPixel {
 }
 
 interface IOptions {
-    width?: 375;
-    height?: 667;
-    link?: '';
+    width?: number;
+    height?: number;
+    link?: string;
     geo?: { longitude: number; latitude: number };
-    ip?: '127.0.0.1';
-    maxHeight?: 667;
-    deviceName?: 'iPhone 6';
+    ip?: string;
+    maxHeight?: number;
+    deviceName?: string;
     showProgress?: false;
+    xff?: boolean;
 }
 
 export async function screenshot(options: IOptions) {
@@ -38,6 +39,7 @@ export async function screenshot(options: IOptions) {
         maxHeight = 667,
         deviceName = 'iPhone 6',
         showProgress = false,
+        xff = true,
     } = options;
     let waitUntil: PuppeteerLifeCycleEvent[] = ['load', 'networkidle0'];
     const { devices } = puppeteer;
@@ -62,7 +64,9 @@ export async function screenshot(options: IOptions) {
             headers['origin'] = location.origin; // 仅跨域时添加
         }
         headers['referer'] = location.origin;
-        headers['X-Forwarded-For'] = ip;
+        if (xff) {
+            headers['X-Forwarded-For'] = ip;
+        }
         request.continue({ headers });
     });
     progress('页面加载');
@@ -76,25 +80,40 @@ export async function screenshot(options: IOptions) {
             await page.goto(link, { waitUntil });
             progress('降级加载');
         } catch (error) {
-            progress('加载失败');
             await browser.close();
-            return { error: { message: error.message, link } };
+            if (xff) {
+                progress('!XFF加载');
+                return screenshot({ ...options, xff: false });
+            } else {
+                progress('加载失败');
+                return { error: { message: error.message, link } };
+            }
         }
     }
     progress('计算高度');
-    const pageHeight = await page.evaluate(getPageHeight, width, height);
+    let pageHeight;
+    // 第1遍获取页面高度：视口高度 + 未进入视口的页面高度
+    pageHeight = await page.evaluate(getPageHeight, width, height);
+    progress(`页面高度:【${pageHeight}】`);
+    // 第2遍调整视口，激活所有懒加载
+    await page.emulate(getDevice(devices[deviceName], width, pageHeight));
+    await page.waitForTimeout(1000);
+    await page.evaluate(preloadImage);
+    // 第2遍获取页面高度：页面元素完全展示后的真实高度
+    pageHeight = await page.evaluate(getPageHeight, width, height);
+    progress(`页面高度:【${pageHeight}】`);
+    // 第3遍调整视口，设置为页面真实高度
     await page.emulate(getDevice(devices[deviceName], width, pageHeight));
     try {
-        await page.reload({ waitUntil });
-        await page.waitForTimeout(1000);
+        await page.reload({});
         progress('页面重载');
     } catch (error) {
-        progress('加载失败');
+        progress('重载失败');
         await browser.close();
         return { error: { message: error.message, link } };
     }
-    await page.evaluate(preloadImage);
     await page.waitForTimeout(1000);
+    await page.evaluate(preloadImage);
     progress('页面截图');
     const imageBinary = await page.screenshot({ fullPage: false, captureBeyondViewport: true });
     progress('图像裁剪');
@@ -223,9 +242,13 @@ export function getDevice(device: Device, width: number, height: number) {
     device.viewport.deviceScaleFactor = 1;
     return device;
 }
-
 export function getPageHeight(width: number, height: number) {
+    // 重置视口为标准视口
+    const view: any = document.querySelector('meta[name="viewport"]') || {};
+    view.content = 'width=device-width, minimum-scale=1.0, maximum-scale=1.0, initial-scale=1.0';
+    // 获取页面真实高度
     let maxHeight = height;
+    // var maxHeight = 667;
     const getStyle = (el: Element, style: string) => window.getComputedStyle(el).getPropertyValue(style);
     document.querySelectorAll('*').forEach(el => {
         const sh = Array.from(el.children).reduce((sh, child) => {
@@ -237,5 +260,6 @@ export function getPageHeight(width: number, height: number) {
         }, 0);
         maxHeight = Math.max(maxHeight, sh);
     });
+    // console.log(maxHeight);
     return maxHeight;
 }
