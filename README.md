@@ -81,7 +81,7 @@ const list = [
     'https://v.book.qq.com/bookInfo.html?cbid=16672287405492604&hidetitlebar=1&ptag=viphome',
     'https://www.17xueba.com/',
     'https://s.immomo.com/fep/momo/fep-web/business-channel-download/index.html?id=61920f692cd17&version=2',
-    'https://chenzhongkj.com/rest/n/lp/page/getHtml?hyId=landingPg&pageId=267476982209454080'
+    'https://chenzhongkj.com/rest/n/lp/page/getHtml?hyId=landingPg&pageId=267476982209454080',
 ];
 // 遍历
 list.forEach(link => {
@@ -105,5 +105,8 @@ list.forEach(link => {
         }
     });
 });
-
 ````
+
+## Todo
+
+-   浏览器复用
