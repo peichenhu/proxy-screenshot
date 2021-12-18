@@ -4,6 +4,12 @@
 
 > npm i proxy-screenshot
 
+-   支持浏览器复用
+-   支持模拟 IP/GEO 城市定位
+-   支持 PC/Mobile 网页
+-   支持处理懒加载图片
+-   默认裁剪空白色块
+
 ## demo
 
 ````js
@@ -12,8 +18,8 @@
  * @param options 函数接受一个对象参数
  * @example
  * ```js
- * const { saveImageByCanvas, screenshot } = require('proxy-screenshot')
- * screenshot({
+ * const { page } = require('proxy-screenshot')
+ * page.screenshot({
  *     showProgress: boolean; // 可选参数, 是否展示运行进度, 默认值 false
  *     link: string; // 可选参数, 需要截图的网页链接, 默认值 ''
  *     deviceName: string; // 可选参数, 模拟设备的标示名称, 默认值 iPhone 6
@@ -29,13 +35,13 @@
  * ```
  * @returns 执行失败返回 `Promise<{ error: { message: any; link: any; }}> `
  * @returns 执行成功返回 `Promise<{ canvas: Canvas; }> `
- * @remarks 执行成功后可以使用 `saveImageByCanvas(canvas, outImgFile: string);` 保存 JPEG 图片到本地.
+ * @remarks 执行成功后可以使用 `page.saveImageByCanvas(canvas, outImgFile: string);` 保存 JPEG 图片到本地.
  */
 
 'use strict';
 const { URL } = require('node:url');
-// const { saveImageByCanvas, screenshot } = require('proxy-screenshot');
-const { saveImageByCanvas, screenshot } = require('../dist/index.js');
+// const { page } = require('proxy-screenshot');
+const { page } = require('../dist/index.js');
 // IP 定位
 const IP = {
     beijing: '111.13.147.215',
@@ -88,8 +94,8 @@ list.forEach(link => {
     const { hostname, pathname } = new URL(link);
     const path = pathname.replace(/\//g, '') || '';
     const outImgFile = `test/images/${hostname}${path && '.' + path}.jpeg`;
-    screenshot({
-        showProgress: true,
+    page.screenshot({
+        showProgress: false,
         width: 375,
         height: 667,
         maxHeight: 667 * 20,
@@ -101,7 +107,7 @@ list.forEach(link => {
         if (error) {
             console.log(error);
         } else {
-            saveImageByCanvas(canvas, outImgFile);
+            page.saveImageByCanvas(canvas, outImgFile);
         }
     });
 });

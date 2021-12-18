@@ -1,7 +1,7 @@
 'use strict';
 const { URL } = require('node:url');
-// const { saveImageByCanvas, screenshot } = require('proxy-screenshot');
-const { saveImageByCanvas, screenshot } = require('../dist/index.js');
+// const { page } = require('proxy-screenshot');
+const { page } = require('../dist/index.js');
 // IP 定位
 const IP = {
     beijing: '111.13.147.215',
@@ -47,15 +47,15 @@ const list = [
     'https://v.book.qq.com/bookInfo.html?cbid=16672287405492604&hidetitlebar=1&ptag=viphome',
     'https://www.17xueba.com/',
     'https://s.immomo.com/fep/momo/fep-web/business-channel-download/index.html?id=61920f692cd17&version=2',
-    'https://chenzhongkj.com/rest/n/lp/page/getHtml?hyId=landingPg&pageId=267476982209454080'
+    'https://chenzhongkj.com/rest/n/lp/page/getHtml?hyId=landingPg&pageId=267476982209454080',
 ];
 // 遍历
 list.forEach(link => {
     const { hostname, pathname } = new URL(link);
     const path = pathname.replace(/\//g, '') || '';
     const outImgFile = `test/images/${hostname}${path && '.' + path}.jpeg`;
-    screenshot({
-        showProgress: true,
+    page.screenshot({
+        showProgress: false,
         width: 375,
         height: 667,
         maxHeight: 667 * 20,
@@ -67,7 +67,7 @@ list.forEach(link => {
         if (error) {
             console.log(error);
         } else {
-            saveImageByCanvas(canvas, outImgFile);
+            page.saveImageByCanvas(canvas, outImgFile);
         }
     });
 });

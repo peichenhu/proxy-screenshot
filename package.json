@@ -1,6 +1,6 @@
 {
     "name": "proxy-screenshot",
-    "version": "3.0.6",
+    "version": "3.0.7",
     "description": "一个使用 Puppeteer 对 PC 网站或者特殊布局的 H5 页面进行截图的 NPM 工具包",
     "main": "dist/index.js",
     "dependencies": {
