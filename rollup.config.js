@@ -12,7 +12,7 @@ import pkg from './package.json';
 export default [
     {
         input: 'src/index.ts',
-        external: ['node:url', 'node:fs', 'node:events', 'canvas', 'puppeteer'],
+        external: ['chalk', 'commander', 'node:path', 'node:fs', 'canvas', 'puppeteer'],
         plugins: [
             globals(),
             builtins(),
@@ -27,7 +27,7 @@ export default [
         output: {
             exports: 'named',
             format: 'cjs', // NodeESM 平台规范包
-            // banner: '#!/usr/bin/env node',
+            banner: '#!/usr/bin/env node',
             file: pkg.main,
         },
     },

@@ -1,30 +1,34 @@
 {
-    "name": "proxy-screenshot",
-    "version": "3.0.7",
-    "description": "一个使用 Puppeteer 对 PC 网站或者特殊布局的 H5 页面进行截图的 NPM 工具包",
+    "name": "ks-screenshot",
+    "version": "1.0.1",
+    "description": "一个使用 Puppeteer 对 PC 网站或者 Mobile 页面进行截图的 NPM 工具包",
     "main": "dist/index.js",
+    "bin": {
+        "ks-screenshot": "dist/index.js"
+    },
     "dependencies": {
-        "canvas": "^2.8.0",
-        "puppeteer": "^11.0.0",
-        "puppeteer-core": "^11.0.0"
+        "chalk": "^3.0.0-beta.2",
+        "commander": "^9.4.0",
+        "puppeteer": "^16.2.0"
     },
     "devDependencies": {
         "@rollup/plugin-commonjs": "^11.0.1",
         "@rollup/plugin-node-resolve": "^13.0.6",
         "@rollup/plugin-typescript": "^8.3.0",
+        "@types/node": "^18.7.9",
         "rollup": "^2.61.1",
         "rollup-plugin-node-builtins": "^2.1.2",
         "rollup-plugin-node-globals": "^1.4.0",
         "rollup-plugin-terser": "^7.0.2",
         "tslib": "^2.3.0",
-        "typescript": "^4.3.5"
+        "typescript": "^4.7.4"
     },
     "scripts": {
-        "build": "rollup -c",
-        "test": "node test/test.js"
+        "build": "rollup -c"
     },
     "files": [
-        "dist"
+        "dist",
+        "src"
     ],
     "author": "chenhu.pei",
     "keywords": [
@@ -35,9 +39,9 @@
     ],
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/pch1024/proxy-screenshot.git"
+        "url": "git+https://github.com/peichenhu/proxy-screenshot.git"
     },
-    "homepage": "https://github.com/pch1024/proxy-screenshot#readme",
+    "homepage": "https://github.com/peichenhu/proxy-screenshot#readme",
     "maintainers": [
         {
             "name": "chenhu.pei",

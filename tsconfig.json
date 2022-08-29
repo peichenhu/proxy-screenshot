@@ -1,10 +1,19 @@
 {
     "include": ["src"],
-    "exclude": ["dist"],
-    "module": "CommonJS",
     "compilerOptions": {
         "outDir": "dist",
-        "declaration": true,
-        "declarationDir": "."
+        "allowJs": true,
+        "target": "ES2016",
+        "module": "esnext",
+        "strict": true,
+        "moduleResolution": "node",
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "sourceMap": false,
+        "types": ["node"],
+        "declaration": true, // 是否生成声明文件
+        "emitDeclarationOnly": true,
+        "declarationDir": "types" // 声明文件打包的位置
     }
 }
