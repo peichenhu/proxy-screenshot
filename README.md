@@ -1,12 +1,8 @@
-# ks-web-screenshot
+# ks-screenshot
 
 一个使用 Puppeteer 对网站进行页面截图 NPM 工具包
 
-> sudo npm i ks-web-screenshot -g
-
--   支持模拟 IP/GEO 城市定位
--   支持 PC/Mobile 网页
--   支持处理懒加载图片
+> sudo npm i ks-screenshot -g
 
 ```bash
 
@@ -27,4 +23,5 @@ Options:
   --click, [click]                      页面点击 (default: "")
   --outfile, [outfile]                  输出文件 (default: "")
   --log                                 输出实时进度
+
 ```
