@@ -79,3 +79,63 @@ function createTask(list) {
 }
 
 createTask(list_h5);
+
+(function () {
+    const getStyle = (el, style) => window.getComputedStyle(el).getPropertyValue(style);
+    const compareStyle = (el, style, styleValue) => getStyle(el, style) === styleValue;
+
+    let pageHeight = Math.max(document.body.scrollHeight, document.body.clientHeight);
+    console.log('document.body.height', pageHeight);
+    function findHighestNode(children) {
+        for (var i = children.length - 1; i >= 0; i--) {
+            const el = children[i];
+            if ((el.scrollHeight, el.clientHeight)) {
+                console.log('el', el.scrollHeight, el.clientHeight, el);
+                if (compareStyle(el, 'display', 'none')) {
+                    pageHeight = Math.max(pageHeight, 0);
+                } else if (compareStyle(el, 'overflow-y', 'auto') || compareStyle(el, 'overflow-y', 'scroll')) {
+                    pageHeight = Math.max(pageHeight, el.scrollHeight);
+                    console.log('scroll', el.scrollHeight, el);
+                    findHighestNode(el.childNodes);
+                } else if (compareStyle(el, 'overflow-y', 'hidden')) {
+                    pageHeight = Math.max(pageHeight, el.clientHeight);
+                    findHighestNode(el.childNodes);
+                } else {
+                    pageHeight = Math.max(pageHeight, el.clientHeight);
+                    findHighestNode(el.childNodes);
+                }
+            }
+        }
+    }
+
+    findHighestNode(document.body.children);
+    console.log('Page height is', pageHeight);
+})();
+
+(function () {
+    const getStyle = (el, style) => window.getComputedStyle(el).getPropertyValue(style);
+    const compareStyle = (el, style, styleValue) => getStyle(el, style) === styleValue;
+    const computedElHeight = function (el) {
+        if (el.scrollHeight && el.clientHeight && !compareStyle(el, 'display', 'none')) {
+            if (getStyle(el, 'overflow-y') === 'hidden') {
+                return el.clientHeight;
+            }
+            return Math.max(el.scrollHeight, el.clientHeight);
+        }
+        return 0;
+    };
+
+    let maxHeight = 0;
+    document.querySelectorAll('*').forEach(el => {
+        const sumChildHeight = Array.from(el.children).reduce((sum, child) => {
+            sum += computedElHeight(child);
+            return sum;
+        }, 0);
+        const elHeight = computedElHeight(el);
+        // console.log('elHeight', elHeight, el);
+        // console.log('sumChildHeight', sumChildHeight, el);
+        const elRealHeight = Math.min(elHeight, sumChildHeight);
+        maxHeight = Math.max(maxHeight, elRealHeight);
+    });
+    console.info(maxHeight);
+})();

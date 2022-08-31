@@ -61,10 +61,10 @@ echo "\033[35m======================================================\033[0m"
 # node ./bin/main.js --ip 171.221.172.76 --geo 116,40 --url https%3A%2F%2Fi.bianxianmao.com%2Factivities%3FappKey%3D4c140e60899d4df4a20b74b8f3020109%26appEntrance%3D58%26business%3Dmoney
 
 # npx
-ks-screenshot --geo 104.08347,30.65614 --ip 171.221.172.76 --url https%3A%2F%2Ftfh5.lidwq.cn%2Fxb%2Fxz1q%2Findex%3FchannelId%3D6118JW
-ks-screenshot --ip 171.221.172.76 --geo 116,40 --url https%3A%2F%2Fapp.kwaixiaodian.com%2Fmerchant%2Fshop%2Fdetail%3Fid%3D4154405891535%26hyId%3Dkwaishop%26layoutType%3D4%26extType%3D1
-ks-screenshot --ip 171.221.172.76 --geo 116,40 --url https%3A%2F%2Fapp.kwaixiaodian.com%2Fmerchant%2Fshop%2Fdetail%3Fid%3D3822098374573%26hyId%3Dkwaishop%26layoutType%3D4%26extType%3D1
+node ./bin/main.js --geo 104.08347,30.65614 --ip 171.221.172.76 --url https%3A%2F%2Ftfh5.lidwq.cn%2Fxb%2Fxz1q%2Findex%3FchannelId%3D6118JW
+node ./bin/main.js --ip 171.221.172.76 --geo 116,40 --url https%3A%2F%2Fapp.kwaixiaodian.com%2Fmerchant%2Fshop%2Fdetail%3Fid%3D4154405891535%26hyId%3Dkwaishop%26layoutType%3D4%26extType%3D1
+node ./bin/main.js --ip 171.221.172.76 --geo 116,40 --url https%3A%2F%2Fapp.kwaixiaodian.com%2Fmerchant%2Fshop%2Fdetail%3Fid%3D3822098374573%26hyId%3Dkwaishop%26layoutType%3D4%26extType%3D1
 
 # test
 
-# node ./bin/main.js --ip 171.221.172.76 --geo 116,40 --url https%3A%2F%2Fapp.kwaixiaodian.com%2Fmerchant%2Fshop%2Fdetail%3Fid%3D3822098374573%26hyId%3Dkwaishop%26layoutType%3D4%26extType%3D1
+# node ./bin/main.js --log --ip 171.221.172.76 --geo 116,40 --url https%3A%2F%2Fapp.kwaixiaodian.com%2Fmerchant%2Fshop%2Fdetail%3Fid%3D3822098374573%26hyId%3Dkwaishop%26layoutType%3D4%26extType%3D1

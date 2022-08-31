@@ -5,6 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const puppeteer = require('puppeteer');
 const { Command } = require('commander');
+const { createCanvas, loadImage } = require('canvas');
 const pkg = require('../package.json');
 
 const program = new Command();
@@ -16,16 +17,17 @@ program.version(pkg.version);
 program.option('--url, [url]', '使用 encodeURIComponent 处理过的链接');
 program.option('--emulate, [emulate]', '浏览器模拟器, 空格使用下划线连字符代替, 例如: PC 或者 iPhone_6', 'iPhone_6');
 program.option('--fullpage, [fullpage]', '是否要全屏', true);
-program.option('--maxheight, [maxheight]', '页面最大支持高度', String(2000));
+program.option('--maxheight, [maxheight]', '页面最大支持高度', String(10000));
 program.option('--w, [w]', '自定义宽度', String(0));
 program.option('--h, [h]', '自定义高度', String(0));
 program.option('--waitfortime, [waitfortime]', '等待时间，单位毫秒', String(10 * 1000));
 program.option('--waitforselector, [waitforselector]', '等待选择器出现在页面中', 'body');
 program.option('--auth, [auth]', '基本 HTTP 身份验证,例如： username;password', '');
+program.option('--cookies, [cookies]', '页面预设置cookie数据, 例如: JSON.stringify([{name, value, domain, url}]) ', '[]');
 program.option('--ip, [ip]', '模拟代理IP,例如: 武汉 27.18.198.204', '');
 program.option('--geo, [geo]', '模拟地理定位,例如: 武汉 114,30', '');
 program.option('--outfile, [outfile]', '输出图像文件, 格式 JPEG, 默认 "./output/[url.hostname][hash].jpg"', '');
-program.option('--quality, [quality]', '输出图像文件品质, ', '80');
+program.option('--quality, [quality]', '输出图像文件品质, ', '100');
 program.option('--log', '输出实时进度');
 program.action(options => {
     // ===== geo =====
@@ -57,11 +59,11 @@ program.action(options => {
     const outfile = options.outfile;
     if (!outfile) {
         const hostname = new URL(options.url).hostname;
-        const filename = `output/${hostname}.${TASK_ID}.png`;
+        const filename = `output/${hostname}.${TASK_ID}.jpg`;
         const filePath = path.resolve(process.cwd(), filename);
         options.outfile = filePath;
-    } else if (!outfile.endsWith('.png')) {
-        console.log('参数 --outfile 配置有误, 文件输出格式应该为 image/png');
+    } else if (!outfile.endsWith('.png') || !outfile.endsWith('.jpg')) {
+        console.log('参数 --outfile 配置有误, 文件输出格式应该为 jpg 或者 png');
         process.exit();
     } else {
         options.outfile = path.resolve(process.cwd(), outfile);
@@ -75,9 +77,9 @@ program.action(options => {
     // ===== number =====
     options.w = !isNaN(Number(options.w)) ? Number(options.w) : 0;
     options.h = !isNaN(Number(options.h)) ? Number(options.h) : 0;
-    options.quality = !isNaN(Number(options.quality)) ? Number(options.quality) : 80;
-    options.maxheight = !isNaN(Number(options.maxheight)) ? Number(options.maxheight) : 80;
-    options.waitfortime = !isNaN(Number(options.waitfortime)) ? Number(options.waitfortime) : 10 * 1000;
+    options.quality = !isNaN(Number(options.quality)) ? Number(options.quality) : 100;
+    options.maxheight = !isNaN(Number(options.maxheight)) ? Number(options.maxheight) : 10000;
+    options.waitfortime = !isNaN(Number(options.waitfortime)) ? Number(options.waitfortime) : 10000;
 });
 program.parse(process.argv);
 
@@ -322,12 +324,106 @@ const setProxyIP = async function (page, options) {
 
 const setCookie = async function (page, options) {
     try {
-        log.yellow('设置 Cookie');
+        log.blue('设置 Cookie');
         const cookieList = JSON.parse(options.cookies);
         await page.setCookie(...cookieList);
     } catch (error) {
         log.yellow('设置 Cookie 失败');
     }
+};
+
+const clipImageEmpty = async function (imageBinary, maxHeight = Infinity, allowEmptyHeight = 100) {
+    // 获取图像像素信息
+    async function getImageDataByImage(image) {
+        const { width, height } = image;
+        const canvas = createCanvas(width, Math.min(maxHeight, height));
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(image, 0, 0, width, height);
+        return ctx.getImageData(0, 0, width, height);
+    }
+    // 获取含有像素的色块区域Y轴区间列表
+    async function getHasColorBlockList(imageData) {
+        const hasColorBlockList = []; // 内容色块区域
+        const maxBlocHeight = allowEmptyHeight; // 检测色块高度
+        // 获取 x 行 y 列的像素
+        function getPixel(imageData, x, y) {
+            const i = x * imageData.width + y;
+            return {
+                r: imageData.data[4 * i + 0],
+                g: imageData.data[4 * i + 1],
+                b: imageData.data[4 * i + 2],
+                a: imageData.data[4 * i + 3],
+            };
+        }
+        function isEqualPixel(p1, p2) {
+            return p1.r === p2.r && p1.g === p2.g && p1.b === p2.b && p1.a === p2.a;
+        }
+        // 遍历全部色块
+        for (let i = 0; i < imageData.height; i += maxBlocHeight) {
+            // 获取色块第一个像素
+            const firstPixel = getPixel(imageData, i, 0);
+            let isPureColorBlock = true;
+            // 遍历色块的每一行
+            for (let x = i; x < i + maxBlocHeight; x++) {
+                for (let y = 0; y < imageData.width; y++) {
+                    // 比较色块的所有像素
+                    const pixel = getPixel(imageData, x, y);
+                    // 存在差异色
+                    if (!isEqualPixel(firstPixel, pixel)) {
+                        // 不是纯色块
+                        isPureColorBlock = false;
+                        break;
+                    }
+                }
+            }
+            // 不是纯色块
+            if (!isPureColorBlock) {
+                let start = i;
+                let end = i + maxBlocHeight - 1;
+                end = end < imageData.height ? end : imageData.height;
+                hasColorBlockList.push([start, end]);
+            }
+        }
+        return hasColorBlockList;
+    }
+    // 获取一个去除空白高度区域的新 canvas
+    // hasColorBlockList: [ block:[yAxis.start, yAxis.end] ]
+    async function getCanvasOfClipWhiteBlock(hasColorBlockList = [[0, 0]], image, imgWidth) {
+        const height = hasColorBlockList.reduce((height, yAxis) => {
+            return (height += yAxis[1] - yAxis[0]);
+        }, 0);
+        const canvas = createCanvas(imgWidth, height);
+        const ctx = canvas.getContext('2d');
+        let drawHeight = 0; // 新画布已填充像素的高度
+        hasColorBlockList.forEach(yAxis => {
+            const sx = 0; // 源图像裁剪原点X坐标
+            const sy = yAxis[0]; // 源图像裁剪原点Y坐标
+            const sWidth = imgWidth; // 源图像裁剪宽度
+            const sHeight = yAxis[1] - yAxis[0]; // 源图像裁剪高度
+            const dx = 0; // 图像绘制原点X坐标
+            const dy = drawHeight; // 图像绘制原点Y坐标
+            const dWidth = imgWidth; // 图像绘制宽度
+            const dHeight = yAxis[1] - yAxis[0]; // 图像绘制高度
+            ctx.drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+            drawHeight += sHeight;
+        });
+        return canvas;
+    }
+    const image = await loadImage(imageBinary);
+    const imageData = await getImageDataByImage(image);
+    const hasColorBlockList = await getHasColorBlockList(imageData);
+    return await getCanvasOfClipWhiteBlock(hasColorBlockList, image, imageData.width);
+};
+
+const saveImageByCanvas = async function (canvas, imageName) {
+    const out = fs.createWriteStream(imageName);
+    if (imageName.endsWith('.png')) {
+        canvas.createPNGStream().pipe(out);
+    }
+    if (imageName.endsWith('.jpg')) {
+        canvas.createJPEGStream({ quality: 100 }).pipe(out);
+    }
+    return imageName;
 };
 
 /**
@@ -353,6 +449,7 @@ const OUT_DIR = path.resolve(process.cwd(), './output');
     page.setDefaultNavigationTimeout(1000);
     await page.authenticate(OPTIONS.auth);
     await page.emulate(emulate);
+    await setCookie(page, OPTIONS);
     await onPageConsole(page);
     await setDisguiser(page);
     await setGeo(browser, page, OPTIONS);
@@ -366,13 +463,18 @@ const OUT_DIR = path.resolve(process.cwd(), './output');
     await lazyLoad(page);
     await correctPageHeight(page, emulate);
     await lazyLoad(page);
-    await page.screenshot({
-        // quality: OPTIONS.quality,
-        path: OPTIONS.outfile,
+    const imgBinary = await page.screenshot({
+        quality: OPTIONS.outfile.endsWith('.png') ? undefined : OPTIONS.quality,
+        encoding: 'binary',
+        type: OPTIONS.outfile.endsWith('.png') ? 'png' : 'jpeg',
         fullPage: OPTIONS.fullpage,
         captureBeyondViewport: OPTIONS.fullpage,
-        omitBackground: true,
+        // path: OPTIONS.outfile
     });
+
+    const canvas = await clipImageEmpty(imgBinary, OPTIONS.maxheight);
+
+    await saveImageByCanvas(canvas, OPTIONS.outfile);
 
     await page.close();
 

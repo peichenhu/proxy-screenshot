@@ -1,12 +1,13 @@
 {
     "name": "ks-screenshot",
-    "version": "1.0.7",
+    "version": "1.0.8",
     "description": "一个使用 Puppeteer 对 PC 网站或者 Mobile 页面进行截图的 NPM 工具包",
     "main": "bin/main.js",
     "bin": {
         "ks-screenshot": "bin/main.js"
     },
     "dependencies": {
+        "canvas": "^2.9.3",
         "chalk": "^3.0.0-beta.2",
         "commander": "^9.4.0",
         "puppeteer": "^16.2.0"
